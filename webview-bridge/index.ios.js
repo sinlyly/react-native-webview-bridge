@@ -146,9 +146,12 @@ var WebViewBridge = React.createClass({
     }
 
     var webViewStyles = [styles.container, styles.webView, this.props.style];
-    if (this.state.viewState === WebViewBridgeState.LOADING ||
-      this.state.viewState === WebViewBridgeState.ERROR) {
-      // if we're in either LOADING or ERROR states, don't show the webView
+    // if (this.state.viewState === WebViewBridgeState.LOADING ||
+    //   this.state.viewState === WebViewBridgeState.ERROR) {
+    //   // if we're in either LOADING or ERROR states, don't show the webView
+    //   webViewStyles.push(styles.hidden);
+    // }
+    if (this.state.viewState === WebViewBridgeState.ERROR) {
       webViewStyles.push(styles.hidden);
     }
 
@@ -309,6 +312,11 @@ var styles = StyleSheet.create({
     flex: 0, // disable 'flex:1' when hiding a View
   },
   loadingView: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: BGWASH,
     flex: 1,
     justifyContent: 'center',
