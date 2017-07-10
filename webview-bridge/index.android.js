@@ -31,7 +31,8 @@ var {
   DeviceEventEmitter,
   NativeModules: {
     WebViewBridgeManager
-  }
+  },
+  ActivityIndicator
 } = ReactNative;
 var { PropTypes } = React;
 
@@ -44,6 +45,14 @@ var WebViewBridgeState = keyMirror({
 });
 
 var RCTWebViewBridge = requireNativeComponent('RCTWebViewBridge', WebViewBridge);
+var BGWASH = 'rgba(255,255,255,0.8)';
+
+
+var defaultRenderLoading = () => (
+  <View style={styles.loadingView}>
+    <ActivityIndicator/>
+  </View>
+);
 
 /**
  * Renders a native WebView.
@@ -67,7 +76,7 @@ var WebViewBridge = React.createClass({
     };
   },
 
-  
+
   componentWillMount: function() {
     DeviceEventEmitter.addListener("webViewBridgeMessage", (body) => {
       const { onBridgeMessage } = this.props;
@@ -86,7 +95,7 @@ var WebViewBridge = React.createClass({
     var otherView = null;
 
    if (this.state.viewState === WebViewBridgeState.LOADING) {
-      otherView = this.props.renderLoading && this.props.renderLoading();
+      otherView = (this.props.renderLoading || defaultRenderLoading)();
     } else if (this.state.viewState === WebViewBridgeState.ERROR) {
       var errorEvent = this.state.lastErrorEvent;
       otherView = this.props.renderError && this.props.renderError(
@@ -98,9 +107,12 @@ var WebViewBridge = React.createClass({
     }
 
     var webViewStyles = [styles.container, this.props.style];
-    if (this.state.viewState === WebViewBridgeState.LOADING ||
-      this.state.viewState === WebViewBridgeState.ERROR) {
-      // if we're in either LOADING or ERROR states, don't show the webView
+    // if (this.state.viewState === WebViewBridgeState.LOADING ||
+    //   this.state.viewState === WebViewBridgeState.ERROR) {
+    //   // if we're in either LOADING or ERROR states, don't show the webView
+    //   webViewStyles.push(styles.hidden);
+    // }
+    if (this.state.viewState === WebViewBridgeState.ERROR) {
       webViewStyles.push(styles.hidden);
     }
 
@@ -123,7 +135,7 @@ var WebViewBridge = React.createClass({
  				javaScriptEnabled={true}
         {...props}
         source={resolveAssetSource(source)}
-        style={webViewStyles}
+        style={[webViewStyles,{borderWidth:1,borderColor:'red'}]}
         onLoadingStart={this.onLoadingStart}
         onLoadingFinish={this.onLoadingFinish}
         onLoadingError={this.onLoadingError}
@@ -223,6 +235,19 @@ var WebViewBridge = React.createClass({
 var styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  loadingView: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    flex:1,
+    backgroundColor: BGWASH,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth:1,
+    borderColor:'blue'
   },
   hidden: {
     height: 0,
